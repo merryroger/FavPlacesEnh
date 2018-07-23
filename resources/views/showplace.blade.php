@@ -1,7 +1,7 @@
 @extends('favlist')
 
 @section('listhdr')
-    @include('placeheader')
+    @include('placeheader', ['placeid' => $place->id, 'placename' => $place->name])
     <div class="listpad">
         @foreach($listset->all() as $item)
             <div class="photoframe"
@@ -14,5 +14,5 @@
 
 @section('emptyhdr')
     <div class="listpad">Нет фотографий</div>
-    @include('placeheader')
+    @include('placeheader', ['placeid' => $place->id, 'placename' => $place->name])
 @endsection

@@ -19,8 +19,9 @@ class PlaceController extends Controller
         $placetypes = Placetype::all();
         $types = [];
 
-        foreach ($placetypes as $pt)
+        foreach ($placetypes as $pt) {
             $types[$pt->id] = $pt->name;
+        }
 
         return view('placelist', compact('listset', 'types'));
     }
@@ -42,18 +43,17 @@ class PlaceController extends Controller
 
     public function showPlace($id)
     {
-        $placename = urldecode($id);
-        $place = Place::place($placename)->first();
-        $listset = Picture::pictureList($place->id)->get();
+        //$placename = urldecode($id);
+        $place = Place::placeById($id)->first();
+        $listset = Picture::pictureList($id)->get();
 
-        return view('showplace', compact('placename', 'listset'));
+        return view('showplace', compact('place', 'listset'));
     }
 
     public function addPhoto(Request $request, $id)
     {
         $referer = $request->server('HTTP_REFERER');
-        $name = urldecode($id);
-        $place = Place::place($name)->first();
+        $place = Place::placeById($id)->first();
         $places = Place::all();
 
         return view('add_linked_photo', compact('places', 'place', 'referer'));
@@ -68,18 +68,16 @@ class PlaceController extends Controller
     public function doAddPhoto(PictureRequest $request)
     {
         $file = $request->file('image');
-        //$location = $file->store('collection', 'public');
         $path = $file->storeAs('collection', $file->getClientOriginalName(), 'public');
         list($width, $height) = getimagesize(storage_path('app/public') . "/{$path}");
 
         $location = Storage::url($path);
 
         $place_id = intval($request->input('place_id'));
-        $place = Place::placeById($place_id)->first();
 
         Picture::create(['place_id' => $place_id, 'location' => $location, 'width' => $width, 'height' => $height]);
 
-        return redirect("places/{$place->name}/");
+        return redirect("places/{$place_id}/");
     }
 }
 
